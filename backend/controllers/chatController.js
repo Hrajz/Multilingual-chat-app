@@ -1,4 +1,5 @@
 const Chat = require("../models/Chat.js");
+const User = require("../models/User");
 const mongoose = require("mongoose");
 
 
@@ -20,7 +21,6 @@ exports.startChat = async (req, res) => {
       // If chat exists, return the existing chat
       console.log("chat exists");
       return res.status(200).json(existingChat);
-      
     }
 
     // If chat does not exist, create a new one
@@ -30,6 +30,16 @@ exports.startChat = async (req, res) => {
     });
 
     await newChat.save();
+
+    // Add each user to the other user's friends list
+    await Promise.all(
+      validUsers.map(async (userId, index) => {
+        const otherUserId = validUsers[1 - index]; // Get the other user
+        await User.findByIdAndUpdate(userId, {
+          $addToSet: { friends: otherUserId }, // Add the other user to friends if not already added
+        });
+      })
+    );
 
     res.status(201).json(newChat);
   } catch (err) {
