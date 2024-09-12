@@ -15,9 +15,12 @@ const handleSearch = async () => {
     }
 
     const userId1 = localStorage.getItem("userId");
-    const userId2 = data._id; // Assuming you get a single user from the search result
+    console.log(userId1)
+    const userId2 = data[0]._id; 
+    console.log(userId2);// Assuming you get a single user from the search result
 
-    const chat = await API.post("/chat/start", { userId1, userId2 });
+    const chat = await API.post("/chat/start", { users : [userId1, userId2] });  
+    console.log(chat.data._id)        
 
     setChatId(chat.data._id);
   } catch (err) {

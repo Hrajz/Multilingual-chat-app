@@ -6,7 +6,16 @@ const jwt = require("jsonwebtoken");
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
   const userExists = await User.findOne({ email });
-  if (userExists) return res.status(400).json({ msg: "User already exists" });
+  const usernameExists = await User.findOne({ username });
+  if (userExists){
+    console.log("email already exists");
+    return res.status(400).json({ msg: "User already exists" });
+  }
+  if (usernameExists){
+    console.log("Username already exists");
+    return res.status(400).json({ msg: "User already exists" });
+  }
+    
 
   const user = new User({
     username,
@@ -29,7 +38,8 @@ exports.login = async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  res.json({ token });
+  const username = user._id;;
+  res.json({ token, username });
 };
 
 // search user

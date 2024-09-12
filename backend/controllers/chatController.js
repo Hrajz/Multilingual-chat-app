@@ -1,15 +1,44 @@
 const Chat = require("../models/Chat.js");
+const mongoose = require("mongoose");
+
 
 // Start chat between two users
 exports.startChat = async (req, res) => {
-  const { userId1, userId2 } = req.body;
-  let chat = await Chat.findOne({ users: { $all: [userId1, userId2] } });
-  if (!chat) {
-    chat = new Chat({ users: [userId1, userId2], messages: [] });
-    await chat.save();
+  const { users } = req.body; // Expect an array of ObjectId strings (user IDs)
+  console.log(users);
+
+  try {
+    // Validate the incoming user IDs (ensure they are ObjectIds)
+    const validUsers = users.map((id) => new mongoose.Types.ObjectId(id));
+
+    // Check if a chat already exists between the users
+    const existingChat = await Chat.findOne({
+      users: { $all: validUsers, $size: validUsers.length },
+    });
+
+    if (existingChat) {
+      // If chat exists, return the existing chat
+      console.log("chat exists");
+      return res.status(200).json(existingChat);
+      
+    }
+
+    // If chat does not exist, create a new one
+    const newChat = new Chat({
+      users: validUsers, // Store valid ObjectIds
+      messages: [],
+    });
+
+    await newChat.save();
+
+    res.status(201).json(newChat);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
-  res.json(chat);
 };
+
+
 
 // Send message
 exports.sendMessage = async (req, res) => {
