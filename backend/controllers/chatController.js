@@ -58,3 +58,14 @@ exports.sendMessage = async (req, res) => {
   await chat.save();
   res.json(chat);
 };
+
+exports.getChatWithFriend = async (req, res) => {
+  const { friendId } = req.params;
+  const chat = await Chat.findOne({
+    users: { $all: [req.user.id, friendId] },
+  }).populate("messages.sender", "username");
+
+  if (!chat) return res.status(404).json({ message: "Chat not found!" });
+
+  res.json(chat.messages);
+};

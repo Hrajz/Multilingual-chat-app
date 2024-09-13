@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const userRoutes = require("./routes/userRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -19,5 +20,6 @@ app.use(express.json()); // Parse JSON bodies
 // Routes
 app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/chat", chatRoutes); // Chat routes
+app.use("/api/user", userRoutes); // user routes
 
 module.exports = app;

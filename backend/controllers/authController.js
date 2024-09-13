@@ -38,13 +38,13 @@ exports.login = async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  const username = user._id;;
+  const username = user._id;
   res.json({ token, username });
 };
 
 // search user
 exports.search = async (req, res) => {
-   const { query } = req.body; // assuming you're sending a search query in the request body
+   const { query } = req.body; // sending user id in the request body
 
    // Your search logic here
    console.log(query)
